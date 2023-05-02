@@ -1,0 +1,20 @@
+name: 'sample'
+on:
+  push:
+    branches:
+      - 'main'
+
+
+jobs:
+  checkout:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Try to fail
+        run: exit 1
+      - name: Print message if we don't fail
+        run: echo Should not get here
+
+      - name: 'Cleanup the infrastructure for policy'
+        if: failure()
+        run: echo this should be printed
