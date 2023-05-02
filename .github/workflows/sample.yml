@@ -16,4 +16,4 @@ jobs:
         run: 'echo Should not get here'
       - name: 'Send error message'
         if: failure()
-        run: "curl -h \"Content-Type: application/json\" -X POST {secrets.WEBHOOK_URL} --data \"{\"text\": \"Hello World\"}"
+        run: 'curl -h \"Content-Type: application/json\" -X POST {secrets.WEBHOOK_URL} --data \"{\"text\": \"Hello World\"}\"'
