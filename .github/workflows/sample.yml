@@ -9,12 +9,11 @@ jobs:
   checkout:
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v1
-      - name: Try to fail
-        run: exit 1
-      - name: Print message if we don't fail
-        run: echo Should not get here
-
-      - name: 'Cleanup the infrastructure for policy'
+      - uses: 'actions/checkout@v1'
+      - name: 'Fail workflow'
+        run: 'exit 1'
+      - name: 'Print message if we does not fail'
+        run: 'echo Should not get here'
+      - name: 'Send error message'
         if: failure()
-        run: echo this should be printed
+        run: "curl -h \"Content-Type: application/json\" -X POST {secrets.WEBHOOK_URL} --data \"{\"text\": \"Hello World\"}"
