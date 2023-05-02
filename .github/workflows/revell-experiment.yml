@@ -1,0 +1,9 @@
+name: "Revell testing"
+
+on: workflow_dispatch
+jobs:
+  foo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo ${{ github }}'
+      
