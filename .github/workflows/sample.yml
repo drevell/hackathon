@@ -17,4 +17,4 @@ jobs:
       - name: 'Send error message'
         if: failure()
         run: |
-          curl -h 'Content-Type: application/json' -X POST {secrets.WEBHOOK_URL} --data '{"text": "Hello World"}'
+          curl -H "Content-Type: application/json" -X POST  {secrets.WEBHOOK_URL} --data "{\"text\": \"Hello World\"}"
