@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3' # ratchet:actions/checkout@v3
-      - name: 'Alert'
-        uses: './.github/actions/demo'
+      - name: 'Alert' 
+        uses: 'drevell/hackathon-action@v0.1.0'
         with:
           webhook_url: '${{ secrets.WEBHOOK_URL }}'
           mention: "<users/all>"
