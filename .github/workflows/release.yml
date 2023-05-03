@@ -19,6 +19,6 @@ jobs:
       - uses: 'goreleaser/goreleaser-action@b953231f81b8dfd023c58e0854a721e35037f28b' # ratchet:goreleaser/goreleaser-action@v2
         with:
           version: 'latest'
-          args: 'release --rm-dist'
+          args: 'release --clean'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
