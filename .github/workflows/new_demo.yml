@@ -13,7 +13,7 @@ env:
 
 jobs:
   snapshot:
-    uses: './.github/workflows/sample.yml'
+    uses: './.github/actions/demo'
     secrets: inherit
     with:
       mention: "<users/all>"
