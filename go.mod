@@ -1,6 +1,6 @@
 module github.com/drevell/hackathon
 
-go 1.21
+go 1.20
 
 require github.com/abcxyz/pkg v0.3.0
 
