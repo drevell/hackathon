@@ -43,7 +43,6 @@ func (c *ChatCommand) Desc() string {
 	return "Send a message to a Chat space"
 }
 
-// TODO: nest a "workflowfailed" command under this.
 func (c *ChatCommand) Help() string {
 	return `
 Usage: {{ COMMAND }} [options]
@@ -139,7 +138,6 @@ func main() {
 }
 
 func realMain() error {
-	// Create the command.
 	rootCmd := func() cli.Command {
 		return &cli.RootCommand{
 			Name:    "hackathon",
@@ -168,9 +166,6 @@ func realMain() error {
 
 // ghJson: JSON blob from Github workflow
 func messageBody(ghJson string) ([]byte, error) {
-	// TODO: convert ghJson string -> bytes[], then pass to json.Unmarshal() to
-	// get a JSON message (https://pkg.go.dev/encoding/json#example-Unmarshal),
-	// then retrieve the values we want to put into the chat message.
 	parsedGhJson := map[string]any{}
 	err := json.Unmarshal([]byte(ghJson), &parsedGhJson)
 	if err != nil {
@@ -188,16 +183,10 @@ func messageBody(ghJson string) ([]byte, error) {
 	//   "triggering_actor": "drevell",
 	//   "workflow": "Revell testing",
 
-	text, err := messageText()
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate message text: %w", err)
-	}
-	//var jsonData = []byte(fmt.Sprintf(
-	//	`{
-	//		"text": %s
-	//	}`, text))
-	// Example from https://developers.google.com/chat/api/guides/crudl/messages#create_a_card_message
-	// We can also add buttons and other widgets
+	//text, err := messageText()
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to generate message text: %w", err)
+	//}
 
 	timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
 
@@ -207,7 +196,7 @@ func messageBody(ghJson string) ([]byte, error) {
 			"card": map[string]any{
 				"header": map[string]any{
 					"title":     "GitHub workflow failure",
-					"subtitle":  text,
+					"subtitle":  fmt.Sprintf("Workflow: <b>%s</b>", parsedGhJson["workflow"])
 					"imageUrl":  "https://developers.google.com/chat/images/chat-product-icon.png",
 					"imageType": "CIRCLE",
 				},
@@ -217,14 +206,14 @@ func messageBody(ghJson string) ([]byte, error) {
 						"collapsible":               true,
 						"uncollapsibleWidgetsCount": 1,
 						"widgets": []map[string]any{
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/sms_failed/default/48px.svg",
-									},
-									"text": fmt.Sprintf("<b>Workflow:</b> %s", parsedGhJson["workflow"]),
-								},
-							},
+							// {
+							// 	"decoratedText": map[string]any{
+							// 		"startIcon": map[string]any{
+							// 			"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/sms_failed/default/48px.svg",
+							// 		},
+							// 		"text": fmt.Sprintf("<b>Workflow:</b> %s", ),
+							// 	},
+							// },
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
@@ -233,14 +222,15 @@ func messageBody(ghJson string) ([]byte, error) {
 									"text": fmt.Sprintf("<b>Ref:</b> %s", parsedGhJson["ref"]),
 								},
 							},
-							// {
-							// 	"decoratedText": map[string]any{
-							// 		"startIcon": map[string]any{
-							// 			"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
-							// 		},
-							// 		"text": fmt.Sprintf("<b>Link:</b> %s", parsedGhJson["ref"]),
-							// 	},
-							// },
+							{
+								"decoratedText": map[string]any{
+									"startIcon": map[string]any{
+										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/link/default/48px.svg",
+									},
+									"text": fmt.Sprintf("<b>Failing run link:</b> %s", fmt.Sprintf("https://github.com/%s/actions/runs/%s",
+										parsedGhJson["repository"], parsedGhJson["run_id"])),
+								},
+							},
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
@@ -252,7 +242,7 @@ func messageBody(ghJson string) ([]byte, error) {
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
-										"knownIcon": "PERSON",
+										"knownIcon": "CLOCK",
 									},
 									"text": fmt.Sprintf("<b>Pacific:</b> %s", time.Now().In(timezoneLoc).Format(time.DateTime)),
 								},
@@ -260,7 +250,7 @@ func messageBody(ghJson string) ([]byte, error) {
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
-										"knownIcon": "PERSON",
+										"knownIcon": "CLOCK",
 									},
 									"text": fmt.Sprintf("<b>UTC:</b> %s", time.Now().UTC().Format(time.DateTime)),
 								},
@@ -288,12 +278,6 @@ func messageBody(ghJson string) ([]byte, error) {
 	}
 
 	return json.Marshal(jsonData)
-}
-
-func messageText() (string, error) {
-	//t := "Hey <users/100449440289517201826>"
-	t := "Hey from cli"
-	return t, nil
 }
 
 func htmlTextForParsedGhJson(parsedGhJson map[string]any) (string, error) {
