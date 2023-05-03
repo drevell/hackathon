@@ -28,10 +28,6 @@ import (
 const (
 	envVarWithJsonInput string = "GITHUB_CONTEXT"
 	baseUrl             string = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
-	// TODO: delete these
-	Space string = "AAAAUJgrNvE"
-	Key   string = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
-	Token string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
 )
 
 type ChatCommand struct {
@@ -46,7 +42,7 @@ func (c *ChatCommand) Desc() string {
 	return "Send a message to a Chat space"
 }
 
-// TODO: nest a "workflow-failed" command under this.
+// TODO: nest a "workflowfailed" command under this.
 func (c *ChatCommand) Help() string {
 	return `
 Usage: {{ COMMAND }} [options]
@@ -97,12 +93,9 @@ func (c *ChatCommand) Run(ctx context.Context, args []string) error {
 	}
 
 	args = f.Args()
-	if len(args) != 3 {
-		return fmt.Errorf("expected 3 arguments, got %q", args)
+	if len(args) != 0 {
+		return fmt.Errorf("expected 0 arguments, got %q", args)
 	}
-	space := args[0]
-	key := args[1]
-	token := args[2]
 
 	ghJson := os.Getenv(envVarWithJsonInput)
 	if ghJson == "" {
@@ -115,7 +108,7 @@ func (c *ChatCommand) Run(ctx context.Context, args []string) error {
 		return fmt.Errorf("failed to generate message body: %w", err)
 	}
 
-	url := fmt.Sprintf(baseUrl, space, key, token)
+	url := fmt.Sprintf(baseUrl, c.flagSpace, c.flagKey, c.flagToken)
 	fmt.Println("url: ", url)
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
@@ -165,10 +158,9 @@ func realMain() error {
 	cmd.SetStderr(os.Stdout)
 
 	ctx := context.Background()
-	//err := cmd.Run(ctx, []string{"cmdname", "arg"})
 	err := cmd.Run(ctx, os.Args[1:])
 	if err != nil {
-		return fmt.Errorf("failed to run command")
+		return fmt.Errorf("failed to run command: %w", err)
 	}
 
 	/*
@@ -260,6 +252,14 @@ func messageBody(ghJson string) ([]byte, error) {
 										"knownIcon": "DESCRIPTION",
 									},
 									"text": fmt.Sprintf("GitHub workflow failed: <pre>%s</pre>", parsedGhJson["workflow"]),
+								},
+							},
+							{
+								"decoratedText": map[string]any{
+									"startIcon": map[string]any{
+										"knownIcon": "DESCRIPTION",
+									},
+									"text": fmt.Sprintf("Triggered by: <pre>%s</pre>", parsedGhJson["triggering_actor"]),
 								},
 							},
 							{
