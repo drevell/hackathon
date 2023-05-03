@@ -2,14 +2,11 @@ name: 'sample'
 on:
   workflow_call:
     inputs:
-      message:
-        description: 'Message to be sent'
-        type: 'string'
-        required: true
       mention:
         description: "mention people or not, format <users/user_id>"
         type: 'string'
-        required: true
+        default: '<users/all>'
+        required: false
 
 jobs:
   checkout:
@@ -18,4 +15,4 @@ jobs:
       - uses: 'actions/checkout@v1'
       - name: 'Send error message'
         run: |
-          curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "${{inputs.mention}} ${{inputs.message}}"}'
+          curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "${{inputs.mention}} ${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'

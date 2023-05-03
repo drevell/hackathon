@@ -16,5 +16,4 @@ jobs:
     uses: './.github/workflows/sample.yml'
     secrets: inherit
     with:
-      message: 'hello word'
       mention: "<users/all>"
