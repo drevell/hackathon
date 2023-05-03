@@ -1,6 +1,6 @@
-name: 'GitHub Workflow Alert'
+name: 'Hackathon Action'
 inputs:
-  webhook_url: 
+  webhook_url:
     description: "chat space url"
     type: 'string'
     required: true
@@ -9,29 +9,60 @@ inputs:
     type: 'string'
     default: '<users/all>'
     required: false
+  chat_space:
+    description: "chat space"
+    type: 'string'
+  chat_key:
+    description: "chat key"
+    type: "string"
+  chat_token:
+    description: "chat token"
+    type: "string"
+  github_token:
+    description: "github token"
+    type: string
 
 runs:
   using: 'composite'
   steps:
+    - name: 'download binary'
+      shell: 'bash'
+      run: |-
+        curl -H "Authorization: Token ${{ inputs.github_token }}" -LOv "https://github.com/drevell/hackathon/releases/download/v0.0.11/hackathon_0.0.11_linux_amd64.tar.gz"
+        file hackathon_0.0.11_linux_amd64.tar.gz
+        cat hackathon_0.0.11_linux_amd64.tar.gz
+        tar xzf hackathon_0.0.11_linux_amd64.tar.gz
+    - name: "send message via cli"
+      shell: 'bash'
+      run: |
+        ./hackathon chat workflownotification -space=${{ inputs.chat_space }} -key=${{ inputs.chat_key }} -token=${{ inputs.chat_token }}
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        JOB_CONTEXT: ${{ toJson(job) }}
+        STEPS_CONTEXT: ${{ toJson(steps) }}
+        RUNNER_CONTEXT: ${{ toJson(runner) }}
+        STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        MATRIX_CONTEXT: ${{ toJson(matrix) }}
+
     - name: 'Send error message'
       shell: 'bash'
       run: |
         # curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{"text": "${{inputs.mention}} Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'
-        curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{ 
+        curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{
           "text": "<users/all>",
           "cardsV2": [
             {
-              "cardId": "avatarCard", 
+              "cardId": "avatarCard",
               "card": {
-                "name": "Avatar Card", 
+                "name": "Avatar Card",
                 "header": {
                   "title": "Hello ${{ github.triggering_actor }}!"
-                }, 
-                "sections": [ 
+                },
+                "sections": [
                   {
                     "widgets": [
-                      { 
-                        "textParagraph": { 
+                      {
+                        "textParagraph": {
                           "text": "Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
                         }
                       },
@@ -43,9 +74,9 @@ runs:
                           "text": "<font color=\"#FF0000\">Failed</font>",
                         },
                       },
-                      { 
-                        "image": { 
-                          "imageUrl": "https://media.tenor.com/W_iAZy_edGAAAAAC/patrick-star.gif" 
+                      {
+                        "image": {
+                          "imageUrl": "https://media.tenor.com/W_iAZy_edGAAAAAC/patrick-star.gif"
                         }
                       },
                       {
@@ -69,4 +100,5 @@ runs:
             }
           ]
         }'
+
 
