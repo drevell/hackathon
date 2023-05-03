@@ -1,0 +1,19 @@
+name: 'send-message'
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+env:
+  URL: ${{secrets.WEBHOOK_URL}}
+
+jobs:
+  snapshot:
+    uses: './.github/workflows/sample.yml'
+    secrets: inherit
+    with:
+      mention: "<users/all>"
