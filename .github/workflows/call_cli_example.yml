@@ -22,7 +22,7 @@ jobs:
         run: exit 1
       - name: Report if failed
         if: always()
-        run: ./hackathon chat workflownotification --webhook_url=${{ secrets.webhook_url }}
+        run: ./hackathon chat workflownotification --webhook_url=${{ vars.webhook_url }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}
