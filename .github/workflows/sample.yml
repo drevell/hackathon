@@ -33,10 +33,30 @@ jobs:
                             "text": "Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
                           }
                         },
+                        {
+                          "decoratedText": {
+                            "startIcon": {
+                              "knownIcon": "TICKET",
+                            },
+                            "text": "<font color=\"#FF0000\">Failed</font>",
+                          },
+                        },
                         { 
                           "image": { 
                             "imageUrl": "https://media.tenor.com/W_iAZy_edGAAAAAC/patrick-star.gif" 
                           }
+                        },
+                        "buttonList": {
+                          "buttons" : [
+                            {
+                              "text": "Go to job",
+                              "onClick": {
+                                "openLink": {
+                                  "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}}",
+                                }
+                              }
+                            },
+                          ]
                         }
                       ]
                     }
@@ -46,39 +66,3 @@ jobs:
             ]
           }'
 
-    # {"cardsV2": [{"cardId": "avatarCard", "card": {"name": "Avatar Card", "header": {"title": "Hello Dave!"}}}]}
-
-
-    # -d '{"login":"my_login","password":"my_password"}'
-    # {"cardsV"}
-
-# curl -H "Content-Type: application/json" -X POST  "https://chat.googleapis.com/v1/spaces/AAAAUJgrNvE/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D" --data \
-# '{ 
-#   "cardsV2": [
-#     {
-#       "cardId": "avatarCard", 
-#       "card": {
-#         "name": "Avatar Card", 
-#         "header": {
-#           "title": "Hello Dave!"
-#         }, 
-#         "sections": [ 
-#           {
-#             "widgets": [
-#               { 
-#                 "textParagraph": { 
-#                   "text": "Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
-#                 }
-#               },
-#               { 
-#                 "image": { 
-#                   "imageUrl": "https://media.tenor.com/W_iAZy_edGAAAAAC/patrick-star.gif" 
-#                 }
-#               }
-#             ]
-#           }
-#         ]
-#       }
-#     }
-#   ]
-# }'
