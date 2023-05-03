@@ -12,12 +12,9 @@ inputs:
 
 runs:
   using: 'composite'
-  print-username:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Print
-        run: echo The username is ${{ inputs.webhook_url }}
+  steps:
+    - name: Print
+      run: echo The username is ${{ inputs.webhook_url }}
 
 # jobs:
 #   using: 'composite'
