@@ -1,18 +1,16 @@
 name: 'GitHub Workflow Alert'
+inputs:
+  webhook_url: 
+    description: "chat space url"
+    type: 'string'
+    required: true
+  mention:
+    description: "mention people or not, format <users/user_id>"
+    type: 'string'
+    default: '<users/all>'
+    required: false
 
-on:
-  inputs:
-    webhook_url: 
-      description: "chat space url"
-      type: 'string'
-      required: true
-    mention:
-      description: "mention people or not, format <users/user_id>"
-      type: 'string'
-      default: '<users/all>'
-      required: false
-
-jobs:
+runs:
   using: 'composite'
   print-username:
     runs-on: ubuntu-latest
