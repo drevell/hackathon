@@ -1,0 +1,19 @@
+name: 'send-message'
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+
+jobs:
+  snapshot:
+    uses: './.github/workflows/sample.yaml'
+    with:
+      webhook_url: '${secrets.WEBHOOK_URL}'
+      message: 'hello word'
+      mention: "<users/all>"

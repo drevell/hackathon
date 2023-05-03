@@ -1,0 +1,26 @@
+name: 'demo'
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  secure-setup-terraform:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - name: 'checkout'
+      uses: 'actions/checkout@v3'
+
+    - name: 'Setup Terraform'
+      uses: 'abcxyz/secure-setup-terraform@78e3f2fdfb7ebf59ce42141f6dd93bdd65bf04ed' # ratchet:abcxyz/secure-setup-terraform@v0.2.5
+      with:
+        terraform_version: '1.3.3'
+        terraform_lockfile_location: './terraform/modules'
+    - name: 'Terraform Plan'
+      env:
+        TF_MODULE_DIR: "./terraform/modules/jvs-services"
+      run: |-
+        terraform -chdir=${{ env.TF_MODULE_DIR}} plan

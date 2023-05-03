@@ -1,24 +1,25 @@
 name: 'sample'
 on:
-  push:
-    branches:
-      - 'main'
-  pull_request:
-    branches:
-      - 'main'
-  workflow_dispatch:
-
+  workflow_call:
+    inputs:
+      webhook_url:
+        description: 'The webhook URL'
+        type: 'string'
+        required: true
+      message:
+        description: 'Message to be sent'
+        type: 'string'
+        required: true
+      mention:
+        description: "mention people or not, format <users/user_id>"
+        type: 'string'
+        required: true
 
 jobs:
   checkout:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v1'
-      - name: 'Fail workflow'
-        run: 'exit 1'
-      - name: 'Print message if we does not fail'
-        run: 'echo Should not get here'
       - name: 'Send error message'
-        if: failure()
         run: |
-          curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "<users/all> Hello world"}'
+          curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{"text": "${{inputs.mention}} ${{inputs.message}}"}'
