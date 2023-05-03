@@ -13,7 +13,7 @@ jobs:
         run: exit 1
       - name: Report if failed
         if: failure()
-        run: ./main workflow-tool chatcard
+        run: ./hackathon workflow-tool chatcard
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}

@@ -42,12 +42,18 @@ func (c *ChatcardCommand) Desc() string {
 	return "Send a card message to a Chat space"
 }
 
+// TODO: nest a "workflow-failed" command under this.
 func (c *ChatcardCommand) Help() string {
 	return `
-Usage: {{ COMMAND }} [options]
+Usage: {{ COMMAND }} [options] SPACE KEY TOKEN
 
   The chatcard command sends card messages to Chat spaces.
+
+  SPACE, KEY and TOKEN are values from the webhook url from the chat space.
 `
+	//space               string = "AAAAUJgrNvE"
+	//key                 string = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
+	//token               string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
 }
 
 func (c *ChatcardCommand) Flags() *cli.FlagSet {
@@ -55,11 +61,19 @@ func (c *ChatcardCommand) Flags() *cli.FlagSet {
 }
 
 func (c *ChatcardCommand) Run(ctx context.Context, args []string) error {
-	if err := c.Flags().Parse(args); err != nil {
+	f := c.Flags()
+	if err := f.Parse(args); err != nil {
 		return fmt.Errorf("failed to parse flags: %w", err)
 	}
 
-	// TODO: implement
+	args = f.Args()
+	if len(args) != 3 {
+		return fmt.Errorf("expected 3 arguments, got %q", args)
+	}
+	space := args[0]
+	key := args[1]
+	token := args[2]
+
 	return nil
 }
 
