@@ -30,7 +30,7 @@ jobs:
                       "widgets": [
                         { 
                           "textParagraph": { 
-                            "text": "Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
+                            "text": "<users/all> Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
                           }
                         },
                         {
@@ -46,17 +46,19 @@ jobs:
                             "imageUrl": "https://media.tenor.com/W_iAZy_edGAAAAAC/patrick-star.gif" 
                           }
                         },
-                        "buttonList": {
-                          "buttons" : [
-                            {
-                              "text": "Go to job",
-                              "onClick": {
-                                "openLink": {
-                                  "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}}",
+                        {
+                          "buttonList": {
+                            "buttons" : [
+                              {
+                                "text": "Go to job",
+                                "onClick": {
+                                  "openLink": {
+                                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}}",
+                                  }
                                 }
-                              }
-                            },
-                          ]
+                              },
+                            ]
+                          }
                         }
                       ]
                     }
