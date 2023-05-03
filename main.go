@@ -178,18 +178,25 @@ func realMain() error {
 	return nil
 }
 
-// ghJson: JSON blob from Github workflow
 func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 	timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
+
+	var iconUrl string
+	switch jobJson["status"] {
+	case "success":
+		iconUrl = "https://github.githubassets.com/favicons/favicon-dark.png"
+	default:
+		iconUrl = "https://github.githubassets.com/favicons/favicon-failure-dark.png"
+	}
 
 	jsonData := map[string]any{
 		"cardsV2": map[string]any{
 			"cardId": "createCardMessage",
 			"card": map[string]any{
 				"header": map[string]any{
-					"title":     "GitHub workflow failure",
+					"title":     fmt.Sprintf("GitHub workflow %s", jobJson["status"]),
 					"subtitle":  fmt.Sprintf("Workflow: <b>%s</b>", ghJson["workflow"]),
-					"imageUrl":  "https://developers.google.com/chat/images/chat-product-icon.png",
+					"imageUrl":  iconUrl,
 					"imageType": "CIRCLE",
 				},
 				"sections": []any{
@@ -204,15 +211,6 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
 									},
 									"text": fmt.Sprintf("<b>Ref:</b> %s", ghJson["ref"]),
-								},
-							},
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/link/default/48px.svg",
-									},
-									"text": fmt.Sprintf("<b>Run:</b> %s", fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-										ghJson["repository"], ghJson["run_id"])),
 								},
 							},
 							{
