@@ -13,10 +13,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Print
-      shell: 'bash'
-      run: echo The username is ${{ inputs.webhook_url }}
-
     - name: 'Send error message'
       shell: 'bash'
       run: |
