@@ -2,6 +2,10 @@ name: "My failing workflow with CLI"
 
 on:
   workflow_dispatch:
+    inputs:
+      fail_intentionally:
+        type: boolean
+        default: true
   push:
     branches:
       - main
@@ -15,10 +19,11 @@ jobs:
       - name: Go build
         run: go build -v ./...
       - name: "Fake intentional failing step"
+        if: ${{ inputs.fail_intentionally }}
         run: exit 1
       - name: Report if failed
-        if: failure()
-        run: ./hackathon chat workflownotification -space=${{ vars.CHAT_SPACE }} -key=${{ secrets.CHAT_KEY }} -token=${{ secrets.CHAT_TOKEN }}
+        if: always()
+        run: ./hackathon chat workflownotification --webhook_url="${{ vars.webhook_url }}"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}

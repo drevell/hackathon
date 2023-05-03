@@ -29,15 +29,17 @@ import (
 const (
 	githubContextEnv = "GITHUB_CONTEXT"
 	jobContextEnv    = "JOB_CONTEXT"
-	baseUrl          = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
+	// baseUrl          = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
 )
 
 type WorkflowNotificationCommand struct {
 	cli.BaseCommand
 
-	flagSpace string
-	flagKey   string
-	flagToken string
+	// flagSpace string
+	// flagKey   string
+	// flagToken string
+
+	flagWebhookUrl string
 }
 
 func (c *WorkflowNotificationCommand) Desc() string {
@@ -57,31 +59,40 @@ func (c *WorkflowNotificationCommand) Flags() *cli.FlagSet {
 
 	f := set.NewSection("Chat space options")
 
-	f.StringVar(&cli.StringVar{
-		Name:    "space",
-		Aliases: []string{"s"},
-		Example: "AAAAUJgrNvE",
-		Default: "",
-		Target:  &c.flagSpace,
-		Usage:   "Identifier for chat space to send message to.",
-	})
+	// f.StringVar(&cli.StringVar{
+	// 	Name:    "space",
+	// 	Aliases: []string{"s"},
+	// 	Example: "AAAAUJgrNvE",
+	// 	Default: "",
+	// 	Target:  &c.flagSpace,
+	// 	Usage:   "Identifier for chat space to send message to.",
+	// })
+
+	// f.StringVar(&cli.StringVar{
+	// 	Name:    "key",
+	// 	Aliases: []string{"k"},
+	// 	Example: "BFzaSyDdI0hCZ...",
+	// 	Default: "",
+	// 	Target:  &c.flagKey,
+	// 	Usage:   `"key" from chat webhook url.`,
+	// })
+
+	// f.StringVar(&cli.StringVar{
+	// 	Name:    "token",
+	// 	Aliases: []string{"t"},
+	// 	Example: "VyzWCmy_DdI0hCZ...",
+	// 	Default: "",
+	// 	Target:  &c.flagToken,
+	// 	Usage:   `"token" from chat webhook url.`,
+	// })
 
 	f.StringVar(&cli.StringVar{
-		Name:    "key",
-		Aliases: []string{"k"},
-		Example: "BFzaSyDdI0hCZ...",
+		Name:    "webhook_url",
+		Aliases: []string{"w"},
+		Example: "https://chat.goog...",
 		Default: "",
-		Target:  &c.flagKey,
-		Usage:   `"key" from chat webhook url.`,
-	})
-
-	f.StringVar(&cli.StringVar{
-		Name:    "token",
-		Aliases: []string{"t"},
-		Example: "VyzWCmy_DdI0hCZ...",
-		Default: "",
-		Target:  &c.flagToken,
-		Usage:   `"token" from chat webhook url.`,
+		Target:  &c.flagWebhookUrl,
+		Usage:   `Webhook URL from google chat`,
 	})
 
 	return set
@@ -121,7 +132,9 @@ func (c *WorkflowNotificationCommand) Run(ctx context.Context, args []string) er
 		return fmt.Errorf("failed to generate message body: %w", err)
 	}
 
-	url := fmt.Sprintf(baseUrl, c.flagSpace, c.flagKey, c.flagToken)
+	url := c.flagWebhookUrl
+	fmt.Println("url: ", url)
+
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
 		return fmt.Errorf("creating http request failed: %w", err)
@@ -256,10 +269,6 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 				},
 			},
 		},
-		"thread": map[string]any{
-			"threadKey": "nameOfThread",
-		},
-		"threadReply": true,
 	}
 
 	return json.Marshal(jsonData)
