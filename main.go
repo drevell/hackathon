@@ -262,7 +262,7 @@ func messageBody(ghJson string) ([]byte, error) {
 									"startIcon": map[string]any{
 										"knownIcon": "PERSON",
 									},
-									"text": fmt.Sprintf("<b>UTC:</b> %s", time.Now().UTC().Format(time.DateTime))),
+									"text": fmt.Sprintf("<b>UTC:</b> %s", time.Now().UTC().Format(time.DateTime)),
 								},
 							},
 							{
