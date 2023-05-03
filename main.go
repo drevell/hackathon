@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/abcxyz/pkg/cli"
 )
@@ -152,7 +153,6 @@ func realMain() error {
 	}
 
 	cmd := rootCmd()
-
 	// Help output is written to stderr by default. Redirect to stdout so the
 	// "Output" assertion works.
 	cmd.SetStderr(os.Stdout)
@@ -162,38 +162,6 @@ func realMain() error {
 	if err != nil {
 		return fmt.Errorf("failed to run command: %w", err)
 	}
-
-	/*
-		ghJson := os.Getenv(envVarWithJsonInput)
-		if ghJson == "" {
-			fmt.Println("warning: ", envVarWithJsonInput, " not set, will use demo values")
-		}
-		fmt.Println("ghJson: ", ghJson)
-
-		b, err := messageBody(ghJson)
-		if err != nil {
-			return fmt.Errorf("failed to generate message body: %w", err)
-		}
-
-		url := fmt.Sprintf(baseUrl, Space, Key, Token)
-		fmt.Println("url: ", url)
-		request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
-		if err != nil {
-			return fmt.Errorf("creating http request failed: %w", err)
-		}
-		resp, err := http.DefaultClient.Do(request)
-		if err != nil {
-			return fmt.Errorf("sending http request failed: %w", err)
-		}
-		fmt.Println("resp: ", resp)
-		defer resp.Body.Close()
-
-		testUserID, err := userNameTOUserId("Rui Zhang")
-		if err != nil {
-			return fmt.Errorf("failed to get userID: %w", err)
-		}
-		fmt.Println("testUserID: ", testUserID)
-	*/
 
 	return nil
 }
@@ -230,43 +198,78 @@ func messageBody(ghJson string) ([]byte, error) {
 	//	}`, text))
 	// Example from https://developers.google.com/chat/api/guides/crudl/messages#create_a_card_message
 	// We can also add buttons and other widgets
+
+	timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
+
 	jsonData := map[string]any{
 		"cardsV2": map[string]any{
 			"cardId": "createCardMessage",
 			"card": map[string]any{
 				"header": map[string]any{
-					"title":     "This is the title",
+					"title":     "GitHub workflow failure",
 					"subtitle":  text,
 					"imageUrl":  "https://developers.google.com/chat/images/chat-product-icon.png",
 					"imageType": "CIRCLE",
 				},
 				"sections": []any{
 					map[string]any{
-						"header":                    "This is the section header",
+						// "header":                    "This is the section header",
 						"collapsible":               true,
 						"uncollapsibleWidgetsCount": 1,
 						"widgets": []map[string]any{
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
-										"knownIcon": "DESCRIPTION",
+										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/sms_failed/default/48px.svg",
 									},
-									"text": fmt.Sprintf("GitHub workflow failed: <pre>%s</pre>", parsedGhJson["workflow"]),
+									"text": fmt.Sprintf("<b>Workflow:</b> %s", parsedGhJson["workflow"]),
 								},
 							},
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
-										"knownIcon": "DESCRIPTION",
+										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
 									},
-									"text": fmt.Sprintf("Run by: <pre>%s</pre>", parsedGhJson["triggering_actor"]),
+									"text": fmt.Sprintf("<b>Ref:</b> %s", parsedGhJson["ref"]),
+								},
+							},
+							// {
+							// 	"decoratedText": map[string]any{
+							// 		"startIcon": map[string]any{
+							// 			"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
+							// 		},
+							// 		"text": fmt.Sprintf("<b>Link:</b> %s", parsedGhJson["ref"]),
+							// 	},
+							// },
+							{
+								"decoratedText": map[string]any{
+									"startIcon": map[string]any{
+										"knownIcon": "PERSON",
+									},
+									"text": fmt.Sprintf("<b>Run by:</b> %s", parsedGhJson["triggering_actor"]),
+								},
+							},
+							{
+								"decoratedText": map[string]any{
+									"startIcon": map[string]any{
+										"knownIcon": "PERSON",
+									},
+									"text": fmt.Sprintf("<b>Pacific:</b> %s", time.Now().In(timezoneLoc).Format(time.DateTime)),
+								},
+							},
+							{
+								"decoratedText": map[string]any{
+									"startIcon": map[string]any{
+										"knownIcon": "PERSON",
+									},
+									"text": fmt.Sprintf("<b>UTC:</b> %s", time.Now().UTC().Format(time.DateTime))),
 								},
 							},
 							{
 								"buttonList": map[string]any{
 									"buttons": []any{
 										map[string]any{
-											"text": "Open Failing Run",
+											"text": "Open",
 											"onClick": map[string]any{
 												"openLink": map[string]any{
 													"url": fmt.Sprintf("https://github.com/%s/actions/runs/%s",
