@@ -184,9 +184,9 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 	var iconUrl string
 	switch jobJson["status"] {
 	case "success":
-		iconUrl = "https://github.githubassets.com/favicons/favicon-dark.png"
+		iconUrl = "https://github.githubassets.com/favicons/favicon.png"
 	default:
-		iconUrl = "https://github.githubassets.com/favicons/favicon-failure-dark.png"
+		iconUrl = "https://github.githubassets.com/favicons/favicon-failure.png"
 	}
 
 	jsonData := map[string]any{
