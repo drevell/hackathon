@@ -25,13 +25,13 @@ import (
 	"github.com/abcxyz/pkg/cli"
 )
 
-// TODO: turn most of these into args/flags
 const (
 	envVarWithJsonInput string = "GITHUB_CONTEXT"
 	baseUrl             string = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
-	space               string = "AAAAUJgrNvE"
-	key                 string = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
-	token               string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
+	// TODO: delete these
+	Space string = "AAAAUJgrNvE"
+	Key   string = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
+	Token string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
 )
 
 type ChatcardCommand struct {
@@ -51,9 +51,6 @@ Usage: {{ COMMAND }} [options] SPACE KEY TOKEN
 
   SPACE, KEY and TOKEN are values from the webhook url from the chat space.
 `
-	//space               string = "AAAAUJgrNvE"
-	//key                 string = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
-	//token               string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
 }
 
 func (c *ChatcardCommand) Flags() *cli.FlagSet {
@@ -73,6 +70,36 @@ func (c *ChatcardCommand) Run(ctx context.Context, args []string) error {
 	space := args[0]
 	key := args[1]
 	token := args[2]
+
+	ghJson := os.Getenv(envVarWithJsonInput)
+	if ghJson == "" {
+		fmt.Printf("warning: %s not set, will use demo values", envVarWithJsonInput)
+	}
+	fmt.Println("ghJson: ", ghJson)
+
+	b, err := messageBody(ghJson)
+	if err != nil {
+		return fmt.Errorf("failed to generate message body: %w", err)
+	}
+
+	url := fmt.Sprintf(baseUrl, space, key, token)
+	fmt.Println("url: ", url)
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	if err != nil {
+		return fmt.Errorf("creating http request failed: %w", err)
+	}
+	resp, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return fmt.Errorf("sending http request failed: %w", err)
+	}
+	fmt.Println("resp: ", resp)
+	defer resp.Body.Close()
+
+	testUserID, err := userNameTOUserId("Rui Zhang")
+	if err != nil {
+		return fmt.Errorf("failed to get userID: %w", err)
+	}
+	fmt.Println("testUserID: ", testUserID)
 
 	return nil
 }
@@ -115,7 +142,7 @@ func realMain() error {
 
 	ghJson := os.Getenv(envVarWithJsonInput)
 	if ghJson == "" {
-		fmt.Printf("warning: %s not set, will use demo values", envVarWithJsonInput)
+		fmt.Println("warning: ", envVarWithJsonInput, " not set, will use demo values")
 	}
 	fmt.Println("ghJson: ", ghJson)
 
@@ -124,7 +151,7 @@ func realMain() error {
 		return fmt.Errorf("failed to generate message body: %w", err)
 	}
 
-	url := fmt.Sprintf(baseUrl, space, key, token)
+	url := fmt.Sprintf(baseUrl, Space, Key, Token)
 	fmt.Println("url: ", url)
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
