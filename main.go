@@ -257,6 +257,9 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 				},
 			},
 		},
+		"thread": map[string]any{
+			"threadKey": "nameOfThread",
+		},
 	}
 
 	return json.Marshal(jsonData)
