@@ -1,6 +1,10 @@
 name: 'GitHub Workflow Alert'
 
 inputs:
+  webhook_url: 
+    description: "chat space url"
+    type: 'string'
+    required: true
   mention:
     description: "mention people or not, format <users/user_id>"
     type: 'string'
@@ -13,8 +17,8 @@ jobs:
     - uses: 'actions/checkout@v1'
     - name: 'Send error message'
       run: |
-        # curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "${{inputs.mention}} Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'
-        curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{ 
+        # curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{"text": "${{inputs.mention}} Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'
+        curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{ 
           "text": "<users/all>",
           "cardsV2": [
             {
