@@ -34,30 +34,63 @@ const (
 	Token string = "VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D"
 )
 
-type ChatcardCommand struct {
+type ChatCommand struct {
 	cli.BaseCommand
+
+	flagSpace string
+	flagKey   string
+	flagToken string
 }
 
-func (c *ChatcardCommand) Desc() string {
-	return "Send a card message to a Chat space"
+func (c *ChatCommand) Desc() string {
+	return "Send a message to a Chat space"
 }
 
 // TODO: nest a "workflow-failed" command under this.
-func (c *ChatcardCommand) Help() string {
+func (c *ChatCommand) Help() string {
 	return `
-Usage: {{ COMMAND }} [options] SPACE KEY TOKEN
+Usage: {{ COMMAND }} [options]
 
-  The chatcard command sends card messages to Chat spaces.
-
-  SPACE, KEY and TOKEN are values from the webhook url from the chat space.
+  The chat command sends messages to Chat spaces.
 `
 }
 
-func (c *ChatcardCommand) Flags() *cli.FlagSet {
-	return cli.NewFlagSet()
+func (c *ChatCommand) Flags() *cli.FlagSet {
+	set := cli.NewFlagSet()
+
+	f := set.NewSection("Chat space options")
+
+	f.StringVar(&cli.StringVar{
+		Name:    "space",
+		Aliases: []string{"s"},
+		Example: "AAAAUJgrNvE",
+		Default: "",
+		Target:  &c.flagSpace,
+		Usage:   "Identifier for chat space to send message to.",
+	})
+
+	f.StringVar(&cli.StringVar{
+		Name:    "key",
+		Aliases: []string{"k"},
+		Example: "BFzaSyDdI0hCZ...",
+		Default: "",
+		Target:  &c.flagKey,
+		Usage:   `"key" from chat webhook url.`,
+	})
+
+	f.StringVar(&cli.StringVar{
+		Name:    "token",
+		Aliases: []string{"t"},
+		Example: "VyzWCmy_DdI0hCZ...",
+		Default: "",
+		Target:  &c.flagToken,
+		Usage:   `"token" from chat webhook url.`,
+	})
+
+	return set
 }
 
-func (c *ChatcardCommand) Run(ctx context.Context, args []string) error {
+func (c *ChatCommand) Run(ctx context.Context, args []string) error {
 	f := c.Flags()
 	if err := f.Parse(args); err != nil {
 		return fmt.Errorf("failed to parse flags: %w", err)
@@ -112,63 +145,63 @@ func main() {
 }
 
 func realMain() error {
-	/*
-		// Create the command.
-		rootCmd := func() cli.Command {
-			return &cli.RootCommand{
-				Name:    "workflow-tool",
-				Version: "0.1",
-				Commands: map[string]cli.CommandFactory{
-					"chatcard": func() cli.Command {
-						return &ChatcardCommand{}
-					},
+	// Create the command.
+	rootCmd := func() cli.Command {
+		return &cli.RootCommand{
+			Name:    "workflow-tool",
+			Version: "0.1",
+			Commands: map[string]cli.CommandFactory{
+				"chat": func() cli.Command {
+					return &ChatCommand{}
 				},
-			}
+			},
 		}
+	}
 
-		cmd := rootCmd()
+	cmd := rootCmd()
 
-		// Help output is written to stderr by default. Redirect to stdout so the
-		// "Output" assertion works.
-		cmd.SetStderr(os.Stdout)
+	// Help output is written to stderr by default. Redirect to stdout so the
+	// "Output" assertion works.
+	cmd.SetStderr(os.Stdout)
 
-		ctx := context.Background()
-		//err := cmd.Run(ctx, []string{"cmdname", "arg"})
-		err := cmd.Run(ctx, os.Args[1:])
+	ctx := context.Background()
+	//err := cmd.Run(ctx, []string{"cmdname", "arg"})
+	err := cmd.Run(ctx, os.Args[1:])
+	if err != nil {
+		return fmt.Errorf("failed to run command")
+	}
+
+	/*
+		ghJson := os.Getenv(envVarWithJsonInput)
+		if ghJson == "" {
+			fmt.Println("warning: ", envVarWithJsonInput, " not set, will use demo values")
+		}
+		fmt.Println("ghJson: ", ghJson)
+
+		b, err := messageBody(ghJson)
 		if err != nil {
-			return fmt.Errorf("failed to run command")
+			return fmt.Errorf("failed to generate message body: %w", err)
 		}
+
+		url := fmt.Sprintf(baseUrl, Space, Key, Token)
+		fmt.Println("url: ", url)
+		request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+		if err != nil {
+			return fmt.Errorf("creating http request failed: %w", err)
+		}
+		resp, err := http.DefaultClient.Do(request)
+		if err != nil {
+			return fmt.Errorf("sending http request failed: %w", err)
+		}
+		fmt.Println("resp: ", resp)
+		defer resp.Body.Close()
+
+		testUserID, err := userNameTOUserId("Rui Zhang")
+		if err != nil {
+			return fmt.Errorf("failed to get userID: %w", err)
+		}
+		fmt.Println("testUserID: ", testUserID)
 	*/
-
-	ghJson := os.Getenv(envVarWithJsonInput)
-	if ghJson == "" {
-		fmt.Println("warning: ", envVarWithJsonInput, " not set, will use demo values")
-	}
-	fmt.Println("ghJson: ", ghJson)
-
-	b, err := messageBody(ghJson)
-	if err != nil {
-		return fmt.Errorf("failed to generate message body: %w", err)
-	}
-
-	url := fmt.Sprintf(baseUrl, Space, Key, Token)
-	fmt.Println("url: ", url)
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
-	if err != nil {
-		return fmt.Errorf("creating http request failed: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return fmt.Errorf("sending http request failed: %w", err)
-	}
-	fmt.Println("resp: ", resp)
-	defer resp.Body.Close()
-
-	testUserID, err := userNameTOUserId("Rui Zhang")
-	if err != nil {
-		return fmt.Errorf("failed to get userID: %w", err)
-	}
-	fmt.Println("testUserID: ", testUserID)
 
 	return nil
 }
@@ -182,10 +215,6 @@ func messageBody(ghJson string) ([]byte, error) {
 	err := json.Unmarshal([]byte(ghJson), &parsedGhJson)
 	if err != nil {
 		return nil, fmt.Errorf("JSON unmarshal error: %w:", err)
-	}
-	htmlText, err := htmlTextForParsedGhJson(parsedGhJson)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert json to html text: %w:", err)
 	}
 
 	// example of the parserdGhJson
@@ -230,7 +259,7 @@ func messageBody(ghJson string) ([]byte, error) {
 									"startIcon": map[string]any{
 										"knownIcon": "DESCRIPTION",
 									},
-									"text": htmlText,
+									"text": fmt.Sprintf("GitHub workflow failed: <pre>%s</pre>", parsedGhJson["workflow"]),
 								},
 							},
 							{
