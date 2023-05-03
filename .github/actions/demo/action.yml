@@ -16,9 +16,11 @@ jobs:
   steps:
     - uses: 'actions/checkout@v1'
     - name: 'Send error message'
+      env:
+        "test": ${{inputs.webhook_url}}
       run: |
         # curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{"text": "${{inputs.mention}} Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'
-        curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{ 
+        curl -H "Content-Type: application/json" -X POST  "${{env.test}}" --data '{ 
           "text": "<users/all>",
           "cardsV2": [
             {
