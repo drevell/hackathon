@@ -141,7 +141,7 @@ func realMain() error {
 	// Create the command.
 	rootCmd := func() cli.Command {
 		return &cli.RootCommand{
-			Name:    "workflow-tool",
+			Name:    "hackathon",
 			Version: "0.1",
 			Commands: map[string]cli.CommandFactory{
 				"chat": func() cli.Command {
@@ -259,7 +259,7 @@ func messageBody(ghJson string) ([]byte, error) {
 									"startIcon": map[string]any{
 										"knownIcon": "DESCRIPTION",
 									},
-									"text": fmt.Sprintf("Triggered by: <pre>%s</pre>", parsedGhJson["triggering_actor"]),
+									"text": fmt.Sprintf("Run by: <pre>%s</pre>", parsedGhJson["triggering_actor"]),
 								},
 							},
 							{
