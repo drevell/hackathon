@@ -7,13 +7,14 @@ on:
   pull_request:
     branches:
       - 'main'
-  workflow_dispatch:
 
+env:
+  url: ${{secrets.WEBHOOK_URL}}
 
 jobs:
   snapshot:
-    uses: './.github/workflows/sample.yaml'
+    uses: './.github/workflows/sample.yml'
     with:
-      webhook_url: '${secrets.WEBHOOK_URL}'
+      webhook_url: $url
       message: 'hello word'
       mention: "<users/all>"
