@@ -194,10 +194,9 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 			"cardId": "createCardMessage",
 			"card": map[string]any{
 				"header": map[string]any{
-					"title":     fmt.Sprintf("GitHub workflow %s", jobJson["status"]),
-					"subtitle":  fmt.Sprintf("Workflow: <b>%s</b>", ghJson["workflow"]),
-					"imageUrl":  iconUrl,
-					"imageType": "CIRCLE",
+					"title":    fmt.Sprintf("GitHub workflow %s", jobJson["status"]),
+					"subtitle": fmt.Sprintf("Workflow: <b>%s</b>", ghJson["workflow"]),
+					"imageUrl": iconUrl,
 				},
 				"sections": []any{
 					map[string]any{
@@ -260,6 +259,7 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 		"thread": map[string]any{
 			"threadKey": "nameOfThread",
 		},
+		"threadReply": true,
 	}
 
 	return json.Marshal(jsonData)
