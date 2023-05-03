@@ -1,6 +1,11 @@
 name: "My failing workflow with CLI"
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
 jobs:
   my-job:
     runs-on: ubuntu-latest
@@ -13,7 +18,8 @@ jobs:
         run: exit 1
       - name: Report if failed
         if: failure()
-        run: ./hackathon workflow-tool chatcard
+        # TODO: pull these values from repo variables
+        run: ./hackathon workflow-tool chat -space=AAAAUJgrNvE -key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI -token=VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}
