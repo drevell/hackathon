@@ -29,16 +29,10 @@ import (
 const (
 	githubContextEnv = "GITHUB_CONTEXT"
 	jobContextEnv    = "JOB_CONTEXT"
-	// baseUrl          = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
 )
 
 type WorkflowNotificationCommand struct {
 	cli.BaseCommand
-
-	// flagSpace string
-	// flagKey   string
-	// flagToken string
-
 	flagWebhookUrl string
 }
 
@@ -58,33 +52,6 @@ func (c *WorkflowNotificationCommand) Flags() *cli.FlagSet {
 	set := cli.NewFlagSet()
 
 	f := set.NewSection("Chat space options")
-
-	// f.StringVar(&cli.StringVar{
-	// 	Name:    "space",
-	// 	Aliases: []string{"s"},
-	// 	Example: "AAAAUJgrNvE",
-	// 	Default: "",
-	// 	Target:  &c.flagSpace,
-	// 	Usage:   "Identifier for chat space to send message to.",
-	// })
-
-	// f.StringVar(&cli.StringVar{
-	// 	Name:    "key",
-	// 	Aliases: []string{"k"},
-	// 	Example: "BFzaSyDdI0hCZ...",
-	// 	Default: "",
-	// 	Target:  &c.flagKey,
-	// 	Usage:   `"key" from chat webhook url.`,
-	// })
-
-	// f.StringVar(&cli.StringVar{
-	// 	Name:    "token",
-	// 	Aliases: []string{"t"},
-	// 	Example: "VyzWCmy_DdI0hCZ...",
-	// 	Default: "",
-	// 	Target:  &c.flagToken,
-	// 	Usage:   `"token" from chat webhook url.`,
-	// })
 
 	f.StringVar(&cli.StringVar{
 		Name:    "webhook_url",
