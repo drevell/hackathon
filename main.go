@@ -132,8 +132,8 @@ func (c *WorkflowNotificationCommand) Run(ctx context.Context, args []string) er
 		return fmt.Errorf("failed to generate message body: %w", err)
 	}
 
-	// url := fmt.Sprintf(baseUrl, c.flagSpace, c.flagKey, c.flagToken)
-	url := c.flagWebhookUrl + "&threadKey=spaces/AAAAUJgrNvE/threads/queryParameterThread"
+	//url := c.flagWebhookUrl + "&threadKey=spaces/AAAAUJgrNvE/threads/queryParameterThread"
+	url := c.flagWebhookUrl
 	fmt.Println("url: ", url)
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
@@ -270,10 +270,10 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 				},
 			},
 		},
-		"thread": map[string]any{
-			"threadKey": "spaces/AAAAUJgrNvE/threads/nameOfThread",
-		},
-		"threadReply": true,
+		//"thread": map[string]any{
+		//	"threadKey": "spaces/AAAAUJgrNvE/threads/nameOfThread",
+		//},
+		//"threadReply": true,
 	}
 
 	return json.Marshal(jsonData)
