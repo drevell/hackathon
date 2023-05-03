@@ -18,8 +18,7 @@ jobs:
         run: exit 1
       - name: Report if failed
         if: failure()
-        # TODO: pull these values from repo variables
-        run: ./hackathon chat -space=AAAAUJgrNvE -key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI -token=VyyAuvWCmbwWkXtytXxNIc5R_xX41_fi4WxieHsSggs%3D
+        run: ./hackathon chat -space=${{ vars.CHAT_SPACE }} -key=${{ vars.CHAT_KEY }} -token=${{ vars.CHAT_TOKEN }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}
