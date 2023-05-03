@@ -13,7 +13,7 @@ env:
 
 jobs:
   snapshot:
-    uses: './.github/actions/demo'
+    uses: './.github/actions/demo@v1'
     secrets: inherit
     with:
       mention: "<users/all>"
