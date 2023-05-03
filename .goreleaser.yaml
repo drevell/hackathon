@@ -4,8 +4,8 @@ before:
 
 builds:
   -
-    id: 'osprey-cli'
-    main: ./cmd/cli
+    id: 'hackathon'
+    main: .
     env:
       - 'CGO_ENABLED=0'
       - 'GO111MODULE=on'
@@ -16,9 +16,9 @@ builds:
     ldflags:
       - '-s'
       - '-w'
-      - '-X=github.com/bradegler/osprey/cmd/cli/version.Name={{ .ProjectName }}'
-      - '-X=github.com/bradegler/osprey/cmd/cli/version.Version={{ .Version }}'
-      - '-X=github.com/bradegler/osprey/cmd/cli/version.Commit={{ .Commit }}'
+      - '-X=github.com/drevell/hackathon/version.Name={{ .ProjectName }}'
+      - '-X=github.com/drevell/hackathon/version.Version={{ .Version }}'
+      - '-X=github.com/drevell/hackathon/version.Commit={{ .Commit }}'
       - '-extldflags=-static'
     targets:
       - 'darwin_amd64'
