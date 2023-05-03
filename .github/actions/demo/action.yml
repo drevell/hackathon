@@ -14,6 +14,7 @@ runs:
   using: 'composite'
   steps:
     - name: Print
+      shell: 'bash'
       run: echo The username is ${{ inputs.webhook_url }}
 
 # jobs:
