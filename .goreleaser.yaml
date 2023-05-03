@@ -1,0 +1,45 @@
+before:
+  hooks:
+    - 'go mod tidy'
+    - 'go mod verify'
+
+builds:
+  -
+    id: 'hackathon'
+    main: .
+    env:
+      - 'CGO_ENABLED=0'
+      - 'GO111MODULE=on'
+      - 'GOPROXY=https://proxy.golang.org,direct'
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - '-trimpath'
+    ldflags:
+      - '-s'
+      - '-w'
+      - '-X=github.com/drevell/hackathon/version.Name={{ .ProjectName }}'
+      - '-X=github.com/drevell/hackathon/version.Version={{ .Version }}'
+      - '-X=github.com/drevell/hackathon/version.Commit={{ .Commit }}'
+      - '-extldflags=-static'
+    targets:
+      - 'darwin_amd64'
+      - 'darwin_arm64'
+      - 'linux_amd64'
+      - 'linux_arm64'
+      - 'windows_amd64'
+      - 'windows_arm64'
+    binary: '{{ .ProjectName }}'
+
+archives:
+  - format: 'tar.gz'
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: 'windows'
+        format: 'zip'
+
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA512SUMS'
+  algorithm: 'sha512'
+
+release:
+  draft: false
