@@ -27,11 +27,12 @@ import (
 )
 
 const (
-	envVarWithJsonInput string = "GITHUB_CONTEXT"
-	baseUrl             string = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
+	githubContextEnv = "GITHUB_CONTEXT"
+	jobContextEnv    = "JOB_CONTEXT"
+	baseUrl          = "//chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
 )
 
-type ChatCommand struct {
+type WorkflowNotificationCommand struct {
 	cli.BaseCommand
 
 	flagSpace string
@@ -39,11 +40,11 @@ type ChatCommand struct {
 	flagToken string
 }
 
-func (c *ChatCommand) Desc() string {
+func (c *WorkflowNotificationCommand) Desc() string {
 	return "Send a message to a Chat space"
 }
 
-func (c *ChatCommand) Help() string {
+func (c *WorkflowNotificationCommand) Help() string {
 	return `
 Usage: {{ COMMAND }} [options]
 
@@ -51,7 +52,7 @@ Usage: {{ COMMAND }} [options]
 `
 }
 
-func (c *ChatCommand) Flags() *cli.FlagSet {
+func (c *WorkflowNotificationCommand) Flags() *cli.FlagSet {
 	set := cli.NewFlagSet()
 
 	f := set.NewSection("Chat space options")
@@ -86,7 +87,7 @@ func (c *ChatCommand) Flags() *cli.FlagSet {
 	return set
 }
 
-func (c *ChatCommand) Run(ctx context.Context, args []string) error {
+func (c *WorkflowNotificationCommand) Run(ctx context.Context, args []string) error {
 	f := c.Flags()
 	if err := f.Parse(args); err != nil {
 		return fmt.Errorf("failed to parse flags: %w", err)
@@ -97,19 +98,30 @@ func (c *ChatCommand) Run(ctx context.Context, args []string) error {
 		return fmt.Errorf("expected 0 arguments, got %q", args)
 	}
 
-	ghJson := os.Getenv(envVarWithJsonInput)
-	if ghJson == "" {
-		fmt.Printf("warning: %s not set, will use demo values", envVarWithJsonInput)
+	ghJsonStr := os.Getenv(githubContextEnv)
+	if ghJsonStr == "" {
+		return fmt.Errorf("environment var %s not set", githubContextEnv)
 	}
-	fmt.Println("ghJson: ", ghJson)
+	jobJsonStr := os.Getenv(jobContextEnv)
+	if jobJsonStr == "" {
+		return fmt.Errorf("environment var %s not set", jobContextEnv)
+	}
 
-	b, err := messageBody(ghJson)
+	ghJson := map[string]any{}
+	jobJson := map[string]any{}
+	if err := json.Unmarshal([]byte(ghJsonStr), &ghJson); err != nil {
+		return fmt.Errorf("failed unmarshaling %s: %w", githubContextEnv, err)
+	}
+	if err := json.Unmarshal([]byte(jobJsonStr), &jobJson); err != nil {
+		return fmt.Errorf("failed unmarshaling %s: %w", jobContextEnv, err)
+	}
+
+	b, err := messageBody(ghJson, jobJson)
 	if err != nil {
 		return fmt.Errorf("failed to generate message body: %w", err)
 	}
 
 	url := fmt.Sprintf(baseUrl, c.flagSpace, c.flagKey, c.flagToken)
-	fmt.Println("url: ", url)
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
 		return fmt.Errorf("creating http request failed: %w", err)
@@ -120,12 +132,6 @@ func (c *ChatCommand) Run(ctx context.Context, args []string) error {
 	}
 	fmt.Println("resp: ", resp)
 	defer resp.Body.Close()
-
-	testUserID, err := userNameTOUserId("Rui Zhang")
-	if err != nil {
-		return fmt.Errorf("failed to get userID: %w", err)
-	}
-	fmt.Println("testUserID: ", testUserID)
 
 	return nil
 }
@@ -144,7 +150,15 @@ func realMain() error {
 			Version: "0.1",
 			Commands: map[string]cli.CommandFactory{
 				"chat": func() cli.Command {
-					return &ChatCommand{}
+					return &cli.RootCommand{
+						Name:        "chat2",
+						Description: "Subcommands for chat",
+						Commands: map[string]cli.CommandFactory{
+							"workflownotification": func() cli.Command {
+								return &WorkflowNotificationCommand{}
+							},
+						},
+					}
 				},
 			},
 		}
@@ -165,29 +179,7 @@ func realMain() error {
 }
 
 // ghJson: JSON blob from Github workflow
-func messageBody(ghJson string) ([]byte, error) {
-	parsedGhJson := map[string]any{}
-	err := json.Unmarshal([]byte(ghJson), &parsedGhJson)
-	if err != nil {
-		return nil, fmt.Errorf("JSON unmarshal error: %w:", err)
-	}
-
-	// example of the parserdGhJson
-	// "ref": "refs/heads/main",
-	//   "sha": "541bf7efdce0ec8d874c61e12a65560a51e7f6be",
-	//   "repository": "drevell/hackathon",
-	//   "repository_owner": "drevell",
-	//   "run_id": "4866865265",
-	//   "run_number": "3",
-	//   "run_attempt": "1",
-	//   "triggering_actor": "drevell",
-	//   "workflow": "Revell testing",
-
-	//text, err := messageText()
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to generate message text: %w", err)
-	//}
-
+func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 	timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
 
 	jsonData := map[string]any{
@@ -196,7 +188,7 @@ func messageBody(ghJson string) ([]byte, error) {
 			"card": map[string]any{
 				"header": map[string]any{
 					"title":     "GitHub workflow failure",
-					"subtitle":  fmt.Sprintf("Workflow: <b>%s</b>", parsedGhJson["workflow"])
+					"subtitle":  fmt.Sprintf("Workflow: <b>%s</b>", ghJson["workflow"]),
 					"imageUrl":  "https://developers.google.com/chat/images/chat-product-icon.png",
 					"imageType": "CIRCLE",
 				},
@@ -219,7 +211,7 @@ func messageBody(ghJson string) ([]byte, error) {
 									"startIcon": map[string]any{
 										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
 									},
-									"text": fmt.Sprintf("<b>Ref:</b> %s", parsedGhJson["ref"]),
+									"text": fmt.Sprintf("<b>Ref:</b> %s", ghJson["ref"]),
 								},
 							},
 							{
@@ -228,7 +220,7 @@ func messageBody(ghJson string) ([]byte, error) {
 										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/link/default/48px.svg",
 									},
 									"text": fmt.Sprintf("<b>Failing run link:</b> %s", fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-										parsedGhJson["repository"], parsedGhJson["run_id"])),
+										ghJson["repository"], ghJson["run_id"])),
 								},
 							},
 							{
@@ -236,7 +228,7 @@ func messageBody(ghJson string) ([]byte, error) {
 									"startIcon": map[string]any{
 										"knownIcon": "PERSON",
 									},
-									"text": fmt.Sprintf("<b>Run by:</b> %s", parsedGhJson["triggering_actor"]),
+									"text": fmt.Sprintf("<b>Run by:</b> %s", ghJson["triggering_actor"]),
 								},
 							},
 							{
@@ -263,7 +255,7 @@ func messageBody(ghJson string) ([]byte, error) {
 											"onClick": map[string]any{
 												"openLink": map[string]any{
 													"url": fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-														parsedGhJson["repository"], parsedGhJson["run_id"]),
+														ghJson["repository"], ghJson["run_id"]),
 												},
 											},
 										},
@@ -278,28 +270,4 @@ func messageBody(ghJson string) ([]byte, error) {
 	}
 
 	return json.Marshal(jsonData)
-}
-
-func htmlTextForParsedGhJson(parsedGhJson map[string]any) (string, error) {
-	var htmlText = "<ul>"
-	for key, val := range parsedGhJson {
-		itemList := fmt.Sprintf("<li> %s: %s </li>", key, val)
-		htmlText += itemList
-	}
-	htmlText += "</ul>"
-	return htmlText, nil
-}
-
-func userNameTOUserId(userName string) (string, error) {
-	userIdLoopUp := make(map[string]string)
-
-	// data-hovercard-id=peterhornyack@google.com
-	// data-name=Peter Hornyack , data-member-id= 'user/human/100976612597299399360',
-	userIdLoopUp["Dave Revell"] = "100449440289517201826"
-	userIdLoopUp["Peter Hornyack"] = "100976612597299399360"
-	userIdLoopUp["Rui Zhang"] = "100505938603736143694"
-	userIdLoopUp["Qinhang Li"] = "103739887526947033760"
-	userIdLoopUp["Jonathan Hong"] = "111198084449821418477"
-
-	return userIdLoopUp[userName], nil
 }

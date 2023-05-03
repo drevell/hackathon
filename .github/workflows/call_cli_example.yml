@@ -18,7 +18,7 @@ jobs:
         run: exit 1
       - name: Report if failed
         if: failure()
-        run: ./hackathon chat -space=${{ vars.CHAT_SPACE }} -key=${{ secrets.CHAT_KEY }} -token=${{ secrets.CHAT_TOKEN }}
+        run: ./hackathon chat workflownotification -space=${{ vars.CHAT_SPACE }} -key=${{ secrets.CHAT_KEY }} -token=${{ secrets.CHAT_TOKEN }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}
