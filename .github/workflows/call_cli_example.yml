@@ -19,6 +19,7 @@ jobs:
       - name: Go build
         run: go build -v ./...
       - name: "Fake intentional failing step"
+        if: ${{ inputs.fail_intentionally }}
         run: exit 1
       - name: Report if failed
         if: always()
