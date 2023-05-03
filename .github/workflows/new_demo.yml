@@ -16,7 +16,7 @@ jobs:
       - name: 'Checkout'
         uses: 'actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3' # ratchet:actions/checkout@v3
       - name: 'Alert'
-        uses: './github/actions/demo'
+        uses: './.github/actions/demo'
         with:
           webhook_url: '${{ secrets.WEBHOOK_URL }}'
           mention: "<users/all>"
