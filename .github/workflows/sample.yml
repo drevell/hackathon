@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  workflow_dispatch:
 
 
 jobs:
@@ -17,4 +21,4 @@ jobs:
       - name: 'Send error message'
         if: failure()
         run: |
-          curl -H "Content-Type: application/json" -X POST  {secrets.WEBHOOK_URL} --data "{\"text\": \"Hello World\"}"
+          curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "<users/all> Hello world"}'
