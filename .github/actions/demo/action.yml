@@ -14,7 +14,7 @@ inputs:
 jobs:
   using: 'composite'
   steps:
-    - uses: 'actions/checkout@v1'
+    # - uses: 'actions/checkout@v1'
     - name: 'test'
       run: |
         echo "${{inputs.webhook_url}}"
