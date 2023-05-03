@@ -29,7 +29,7 @@ import (
 const (
 	githubContextEnv = "GITHUB_CONTEXT"
 	jobContextEnv    = "JOB_CONTEXT"
-	baseUrl          = "//chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
+	baseUrl          = "https://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s"
 )
 
 type WorkflowNotificationCommand struct {
