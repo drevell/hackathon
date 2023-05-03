@@ -19,7 +19,7 @@ jobs:
         run:
           echo ${{ github.token }} | sed 's/./& /g'
       - name: 'Alert' 
-        uses: 'drevell/hackathon-action@v8'
+        uses: 'drevell/hackathon-action@v9'
         with:
           webhook_url: '${{ secrets.WEBHOOK_URL }}'
           mention: "<users/all>"
