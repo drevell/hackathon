@@ -198,14 +198,6 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 						"collapsible":               true,
 						"uncollapsibleWidgetsCount": 1,
 						"widgets": []map[string]any{
-							// {
-							// 	"decoratedText": map[string]any{
-							// 		"startIcon": map[string]any{
-							// 			"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/sms_failed/default/48px.svg",
-							// 		},
-							// 		"text": fmt.Sprintf("<b>Workflow:</b> %s", ),
-							// 	},
-							// },
 							{
 								"decoratedText": map[string]any{
 									"startIcon": map[string]any{
@@ -219,7 +211,7 @@ func messageBody(ghJson, jobJson map[string]any) ([]byte, error) {
 									"startIcon": map[string]any{
 										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/link/default/48px.svg",
 									},
-									"text": fmt.Sprintf("<b>Failing run link:</b> %s", fmt.Sprintf("https://github.com/%s/actions/runs/%s",
+									"text": fmt.Sprintf("<b>Run:</b> %s", fmt.Sprintf("https://github.com/%s/actions/runs/%s",
 										ghJson["repository"], ghJson["run_id"])),
 								},
 							},
