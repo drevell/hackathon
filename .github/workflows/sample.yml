@@ -17,20 +17,21 @@ jobs:
         run: |
           # curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "${{inputs.mention}} Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"}'
           curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{ 
+            "text": "<users/all>",
             "cardsV2": [
               {
                 "cardId": "avatarCard", 
                 "card": {
                   "name": "Avatar Card", 
                   "header": {
-                    "title": "Hello Dave!"
+                    "title": "Hello ${{ github.triggering_actor }}!"
                   }, 
                   "sections": [ 
                     {
                       "widgets": [
                         { 
                           "textParagraph": { 
-                            "text": "<users/all> Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
+                            "text": "Repo: https://github.com/${{ github.repository }} had a failing action at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id}} and more words and stuff"
                           }
                         },
                         {
