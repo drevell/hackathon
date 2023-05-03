@@ -9,12 +9,12 @@ on:
       - 'main'
 
 env:
-  url: ${{secrets.WEBHOOK_URL}}
+  URL: ${{secrets.WEBHOOK_URL}}
 
 jobs:
   snapshot:
     uses: './.github/workflows/sample.yml'
+    secrets: inherit
     with:
-      webhook_url: $url
       message: 'hello word'
       mention: "<users/all>"

@@ -2,10 +2,6 @@ name: 'sample'
 on:
   workflow_call:
     inputs:
-      webhook_url:
-        description: 'The webhook URL'
-        type: 'string'
-        required: true
       message:
         description: 'Message to be sent'
         type: 'string'
@@ -22,4 +18,4 @@ jobs:
       - uses: 'actions/checkout@v1'
       - name: 'Send error message'
         run: |
-          curl -H "Content-Type: application/json" -X POST  "${{inputs.webhook_url}}" --data '{"text": "${{inputs.mention}} ${{inputs.message}}"}'
+          curl -H "Content-Type: application/json" -X POST  "${{secrets.WEBHOOK_URL}}" --data '{"text": "${{inputs.mention}} ${{inputs.message}}"}'
